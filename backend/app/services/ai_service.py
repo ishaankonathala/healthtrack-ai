@@ -1,7 +1,6 @@
 import os
 from datetime import timezone
 
-from dotenv import load_dotenv
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
@@ -9,10 +8,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+import backend.app.config  # noqa: F401
 from backend.app.models import SymptomLog
 from backend.app.schemas import AISummaryResponse
-
-load_dotenv()
 
 DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
 NON_DIAGNOSTIC_DISCLAIMER = (

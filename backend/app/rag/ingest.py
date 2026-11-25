@@ -6,6 +6,7 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+import backend.app.config  # noqa: F401
 from backend.app.rag.embeddings import get_embeddings
 
 KNOWLEDGE_DIR = Path(__file__).resolve().parent / "knowledge"

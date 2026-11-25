@@ -5,6 +5,8 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
+import backend.app.config  # noqa: F401
+
 DEFAULT_DATABASE_URL = "sqlite:///./data/healthtrack.db"
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 

@@ -1,10 +1,14 @@
 import os
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
 import requests
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", override=False)
 
 DEFAULT_API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 REQUEST_TIMEOUT_SECONDS = 5
