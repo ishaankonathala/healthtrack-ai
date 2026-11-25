@@ -75,6 +75,27 @@ def test_rag_empty_question_validation():
         assert resp.status_code == 422
 
 
+def test_rag_question_max_length_boundary(monkeypatch):
+    client = TestClient(app)
+
+    too_long_question = "q" * 1001
+    err_resp = client.post("/rag/ask", json={"question": too_long_question})
+    assert err_resp.status_code == 422
+
+    valid_question = "q" * 1000
+    monkeypatch.setattr(
+        "backend.app.routers.rag.answer_health_question",
+        lambda question: {
+            "question": question,
+            "answer": chains.INSUFFICIENT_INFO_ANSWER,
+            "sources": [],
+        },
+    )
+    ok_resp = client.post("/rag/ask", json={"question": valid_question})
+    assert ok_resp.status_code == 200
+    assert len(ok_resp.json()["question"]) == 1000
+
+
 def test_rag_grounded_answer_with_mocked_gemini(temp_chroma_dir, monkeypatch):
     ingest.ingest_knowledge_base(persist_directory=temp_chroma_dir)
     monkeypatch.setenv("GEMINI_API_KEY", "test-fake-key")

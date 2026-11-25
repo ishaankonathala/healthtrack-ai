@@ -7,7 +7,11 @@ class SymptomCreate(BaseModel):
     """Request schema for creating a symptom log."""
 
     patient_id: str = Field(..., max_length=100, description="Unique identifier for the patient")
-    symptom_description: str = Field(..., description="Non-empty description of the symptom")
+    symptom_description: str = Field(
+        ...,
+        max_length=2000,
+        description="Non-empty description of the symptom",
+    )
     severity: int = Field(..., ge=1, le=10, description="Symptom severity on a 1 to 10 scale")
     timestamp: datetime | None = Field(
         default=None,
@@ -71,7 +75,11 @@ class AISummaryResponse(BaseModel):
 class RAGAskRequest(BaseModel):
     """Request schema for asking the RAG health education assistant."""
 
-    question: str = Field(..., description="Non-empty health education question")
+    question: str = Field(
+        ...,
+        max_length=1000,
+        description="Non-empty health education question",
+    )
 
     @field_validator("question")
     @classmethod

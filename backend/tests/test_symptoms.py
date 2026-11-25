@@ -177,3 +177,28 @@ def test_severity_invalid_boundaries(client: TestClient, invalid_severity: int):
         },
     )
     assert response.status_code == 422
+
+
+def test_symptom_description_max_length_boundary(client: TestClient):
+    valid_desc = "a" * 2000
+    ok_resp = client.post(
+        "/symptoms",
+        json={
+            "patient_id": "patient-len",
+            "symptom_description": valid_desc,
+            "severity": 5,
+        },
+    )
+    assert ok_resp.status_code == 201
+    assert len(ok_resp.json()["symptom_description"]) == 2000
+
+    too_long_desc = "a" * 2001
+    err_resp = client.post(
+        "/symptoms",
+        json={
+            "patient_id": "patient-len",
+            "symptom_description": too_long_desc,
+            "severity": 5,
+        },
+    )
+    assert err_resp.status_code == 422
