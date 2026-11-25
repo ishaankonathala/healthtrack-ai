@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+from langchain_core.documents import Document
 from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 
@@ -62,7 +63,9 @@ def test_irrelevant_question_returns_safe_fallback_without_llm(temp_chroma_dir, 
     )
     assert called["llm"] is False
     assert response.sources == []
-    assert "do not have enough information" in response.answer.lower()
+    assert response.answer == chains.INSUFFICIENT_INFO_ANSWER
+    assert "headache, fever, dehydration, and the common cold" in response.answer
+    assert "emergency medical services" not in response.answer.lower()
 
 
 def test_rag_empty_question_validation():
@@ -114,3 +117,43 @@ def test_rag_grounded_answer_with_mocked_gemini(temp_chroma_dir, monkeypatch):
     assert any("Common Cold" in s["title"] for s in data["sources"])
     assert any(s["url"] == "https://medlineplus.gov/commoncold.html" for s in data["sources"])
     assert "MedlinePlus - Common Cold" in captured["prompt"]
+
+
+def test_format_context_groups_duplicate_sources_and_matches_source_list(monkeypatch):
+    docs = [
+        Document(
+            page_content="Headache chunk 1.",
+            metadata={"source_title": "MedlinePlus - Headache", "source_url": "https://medlineplus.gov/headache.html"},
+        ),
+        Document(
+            page_content="Headache chunk 2.",
+            metadata={"source_title": "MedlinePlus - Headache", "source_url": "https://medlineplus.gov/headache.html"},
+        ),
+        Document(
+            page_content="Fever chunk 1.",
+            metadata={"source_title": "MedlinePlus - Fever", "source_url": "https://medlineplus.gov/fever.html"},
+        ),
+    ]
+
+    formatted = chains._format_context(docs)
+    assert "[Source 1: MedlinePlus - Headache (https://medlineplus.gov/headache.html)]" in formatted
+    assert "Headache chunk 1.\n\nHeadache chunk 2." in formatted
+    assert "[Source 2: MedlinePlus - Fever (https://medlineplus.gov/fever.html)]" in formatted
+    assert "[Source 3:" not in formatted
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-fake-key")
+    monkeypatch.setattr(chains, "retrieve_relevant_chunks", lambda **kwargs: docs)
+    monkeypatch.setattr(
+        chains,
+        "_build_llm",
+        lambda api_key, model: RunnableLambda(
+            lambda prompt: AIMessage(content="Grounded answer [Source 1] [Source 2].")
+        ),
+    )
+
+    resp = chains.answer_health_question(question="Headache and fever info?")
+    assert len(resp.sources) == 2
+    assert resp.sources[0].title == "MedlinePlus - Headache"
+    assert resp.sources[0].url == "https://medlineplus.gov/headache.html"
+    assert resp.sources[1].title == "MedlinePlus - Fever"
+    assert resp.sources[1].url == "https://medlineplus.gov/fever.html"

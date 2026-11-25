@@ -11,10 +11,10 @@ from backend.app.schemas import RAGAskResponse, RAGSource
 from backend.app.services.ai_service import MissingAPIKeyError, create_llm, get_gemini_config
 
 INSUFFICIENT_INFO_ANSWER = (
-    "I do not have enough information in the available health education knowledge base "
-    "to answer that question. Please consult a qualified healthcare professional for "
-    "personalized medical advice, or contact emergency medical services if you are "
-    "experiencing severe or urgent symptoms."
+    "I do not have enough information in the available health education "
+    "knowledge base to answer that question. The current resources cover "
+    "headache, fever, dehydration, and the common cold. Please try asking "
+    "a question related to one of these topics."
 )
 
 RAG_SYSTEM_PROMPT = """You are a Health Education Assistant providing general, educational health information.
@@ -27,7 +27,7 @@ Strict Safety & Grounding Rules:
 4. NEVER invent sources, URLs, statistics, or medical claims not present in the supplied context.
 5. For emergency or severe warning symptoms, advise contacting emergency medical services immediately.
 6. If the supplied context does not contain enough information to answer the question, clearly state that the available knowledge base does not cover it.
-7. Include inline citations referencing the retrieved source titles."""
+7. Cite sources using the exact [Source 1], [Source 2] numbering provided in the reference context. Never invent citation numbers."""
 
 RAG_HUMAN_PROMPT = """Reference Context:
 {context}
@@ -60,12 +60,22 @@ def _build_llm(api_key: str, model: str) -> Runnable:
 
 
 def _format_context(docs: list[Document]) -> str:
-    """Format retrieved chunks and their source metadata into reference context."""
-    sections: list[str] = []
-    for idx, doc in enumerate(docs, start=1):
-        title = doc.metadata.get("source_title", "Unknown Source")
-        url = doc.metadata.get("source_url", "")
-        sections.append(f"[Source {idx}: {title} ({url})]\n{doc.page_content}")
+    """Group chunks by source so citation numbers match the UI source list."""
+    grouped: dict[tuple[str, str], list[str]] = {}
+
+    for doc in docs:
+        title = str(doc.metadata.get("source_title", "Unknown Source")).strip()
+        url = str(doc.metadata.get("source_url", "")).strip()
+        key = (title, url)
+        grouped.setdefault(key, []).append(doc.page_content)
+
+    sections = []
+    for idx, ((title, url), chunks) in enumerate(grouped.items(), start=1):
+        content = "\n\n".join(chunks)
+        sections.append(
+            f"[Source {idx}: {title} ({url})]\n{content}"
+        )
+
     return "\n\n".join(sections)
 
 
