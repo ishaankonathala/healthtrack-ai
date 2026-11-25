@@ -191,11 +191,11 @@ Interactive OpenAPI / Swagger documentation is available at `http://127.0.0.1:80
 | :--- | :--- | :--- | :--- | :--- |
 | `GET` | `/` | Service identification | None | `200 OK` returning `{"message": "HealthTrack AI API"}` |
 | `GET` | `/health` | Health check | None | `200 OK` returning `{"status": "ok"}` |
-| `POST` | `/symptoms` | Log a symptom entry | JSON body: `patient_id` (non-empty string, max 100 chars), `symptom_description` (non-empty string), `severity` (int `1–10`), optional `timestamp` (ISO-8601 `datetime`) | `201 Created` with `SymptomResponse`; `422` on empty/whitespace text or out-of-range severity |
+| `POST` | `/symptoms` | Log a symptom entry | JSON body: `patient_id` (non-empty string, max 100 chars), `symptom_description` (non-empty string, max 2,000 chars), `severity` (int `1–10`), optional `timestamp` (ISO-8601 `datetime`) | `201 Created` with `SymptomResponse`; `422` on empty/whitespace text, exceeding max length, or out-of-range severity |
 | `GET` | `/symptoms/{patient_id}` | Retrieve patient history | Path: `patient_id` (non-empty string) | `200 OK` with list of `SymptomResponse` sorted oldest-first (`timestamp ASC, id ASC`); `422` on blank `patient_id` |
 | `GET` | `/analytics/{patient_id}` | 30-day symptom analytics | Path: `patient_id` (non-empty string) | `200 OK` with `AnalyticsResponse` (`total_entries`, `average_severity`, `highest_severity`, `daily_trend`); `422` on blank `patient_id` |
 | `POST` | `/ai/summary/{patient_id}` | Generate doctor-visit summary | Path: `patient_id` (non-empty string) | `200 OK` with `AISummaryResponse` (`summary`, `entry_count`, `model`, `disclaimer`); `404` if no records exist, `503` if `GEMINI_API_KEY` is missing, `502` on provider failure, `422` on blank `patient_id` |
-| `POST` | `/rag/ask` | Ask health education assistant | JSON body: `question` (non-empty string) | `200 OK` with `RAGAskResponse` (`question`, `answer`, `sources`); `422` on blank `question`, `429` on Gemini quota limit, `503` on auth/config error, `504` on timeout, `502` on provider failure |
+| `POST` | `/rag/ask` | Ask health education assistant | JSON body: `question` (non-empty string, max 1,000 chars) | `200 OK` with `RAGAskResponse` (`question`, `answer`, `sources`); `422` on blank `question` or exceeding max length, `429` on Gemini quota limit, `503` on auth/config error, `504` on timeout, `502` on provider failure |
 
 ---
 
@@ -232,9 +232,16 @@ Interactive OpenAPI / Swagger documentation is available at `http://127.0.0.1:80
 - API keys are loaded from `.env` via `python-dotenv` and are never hardcoded in source files.
 - `.env` is excluded from Git via `.gitignore` (while `.env.example` is explicitly allowed).
 - Patient symptom records are stored locally in SQLite (`data/healthtrack.db`) and are **never** indexed into ChromaDB.
+- Symptom records remain local in SQLite and are **not** automatically sent to Gemini; they are only transmitted to the Google Gemini API when the AI doctor-visit summary endpoint (`POST /ai/summary/{patient_id}`) is explicitly invoked, at which point the patient's symptom history and associated `patient_id` are sent to Gemini for processing.
 - ChromaDB stores only the curated public MedlinePlus educational documents.
 - Both AI endpoints include explicit non-diagnostic guardrails prohibiting disease diagnosis, medication prescriptions, or treatment recommendations.
-- **Important:** Do not enter or upload real patient medical information to external AI services; use synthetic patient IDs (e.g., `patient-001`) for testing and demos.
+- **Important:** Only synthetic patient data should be used. Never enter, store, or transmit real patient medical information in this assessment prototype.
+
+### Authentication and Authorization
+
+- This application currently has **no user authentication or patient-level authorization**.
+- The symptom history (`GET /symptoms/{patient_id}`), analytics (`GET /analytics/{patient_id}`), and AI summary (`POST /ai/summary/{patient_id}`) endpoints are not protected by user authentication, meaning any client with access to the API can read or generate summaries for any `patient_id`.
+- Consequently, this prototype is **not suitable for production use or real patient data** without implementing proper authentication, authorization, and privacy controls.
 
 ---
 
@@ -246,11 +253,12 @@ The backend test suite in `backend/tests/` uses isolated temporary SQLite databa
 .venv/bin/pytest -v backend/tests
 ```
 
-Test modules included in the repository:
-- `backend/tests/test_symptoms.py` — symptom creation, validation boundaries, chronological retrieval, and patient isolation (14 tests).
+Test modules included in the repository (**35 tests total**):
+- `backend/tests/test_symptoms.py` — symptom creation, validation boundaries (including 2,000-character max length), chronological retrieval, and patient isolation (15 tests).
 - `backend/tests/test_analytics.py` — 30-day rolling window calculations, daily grouping, missing-date omission, and empty history (5 tests).
 - `backend/tests/test_ai.py` — mocked Gemini summary generation, empty history (`404`), missing API key (`503`), and patient isolation (4 tests).
-- `backend/tests/test_rag.py` — ingestion, duplicate prevention, top-3 retrieval with metadata, citation grouping, empty question validation (`422`), out-of-scope fallback, and mocked grounded answers (6 tests).
+- `backend/tests/test_rag.py` — ingestion, duplicate prevention, top-3 retrieval with metadata, citation grouping, empty question and 1,000-character max-length validation (`422`), out-of-scope fallback, and mocked grounded answers (7 tests).
+- `backend/tests/test_config.py` — `.env` loading, OS environment variable precedence, default values, and subprocess-isolated circular import checks (4 tests).
 
 ---
 
