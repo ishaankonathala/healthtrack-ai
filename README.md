@@ -371,11 +371,10 @@ AI tools were used as development assistants during the creation of HealthTrack 
 
 ### Tools and how they were used
 
-| Tool | Usage |
-|---|---|
-| ChatGPT | Project planning, architecture discussions, understanding implementation approaches, debugging assistance, code explanations, documentation and README refinement. |
-| AI coding assistants | Assistance with code generation, editing, navigating the codebase, and resolving development issues. |
-| Google Gemini | Integrated into the application through LangChain for AI-generated health explanations, Health Intelligence reports and RAG-based educational responses. |
+Tool	How it was used
+ChatGPT	Used as a technical reference for understanding concepts, discussing architectural choices and resolving specific development questions.
+OpenAI Codex	Used to assist with code exploration, implementation tasks and debugging. Suggested changes were reviewed and tested before being incorporated.
+Google Gemini	Integrated into the application to power Health Intelligence reports, AI-generated explanations and the RAG-based health education assistant.
 
 ### How AI-assisted work was verified
 
