@@ -369,25 +369,28 @@ The embedding model is `all-MiniLM-L6-v2`, which runs locally through Sentence T
 
 AI tools were used as development assistants during the creation of HealthTrack AI. They supported implementation and problem-solving, but the final application was assembled, tested, reviewed, and run by the developer.
 
-### Tools and how they were used
+## AI Usage
 
-Tool	How it was used
-ChatGPT	Used as a technical reference for understanding concepts, discussing architectural choices and resolving specific development questions.
-OpenAI Codex	Used to assist with code exploration, implementation tasks and debugging. Suggested changes were reviewed and tested before being incorporated.
-Google Gemini	Integrated into the application to power Health Intelligence reports, AI-generated explanations and the RAG-based health education assistant.
+AI tools were used selectively as development aids during the project. The architecture, feature integration, implementation decisions, testing, and final verification were handled by the developer.
 
-### How AI-assisted work was verified
+### Tools Used
 
-AI-generated suggestions were not treated as automatically correct. Development decisions and generated code were checked through:
+| Tool | How it was used |
+|---|---|
+| ChatGPT | Used as a technical reference for understanding concepts, discussing architectural choices, and resolving specific development questions. |
+| OpenAI Codex | Used to assist with code exploration, implementation tasks, and debugging. Suggested changes were reviewed and tested before being incorporated. |
+| Google Gemini | Integrated into the application to power Health Intelligence reports, AI-generated explanations, and the RAG-based health education assistant. |
 
-- Reviewing and adapting generated code to the existing project structure.
-- Checking API validation and error-handling behaviour.
-- Running backend tests using Pytest.
-- Building the React frontend using Vite.
-- Checking that backend and frontend functionality worked together.
-- Reviewing AI workflow boundaries and data handling.
-- Checking RAG retrieval and response behaviour.
-- Updating documentation to reflect the implemented architecture.
+### Verification and Responsibility
+
+- Reviewed and adapted AI-generated code before integration.
+- Verified backend behaviour through automated tests.
+- Tested API validation and error-handling scenarios.
+- Built and checked the React frontend.
+- Evaluated AI workflow behaviour, retrieval, and fallback responses.
+- Made final implementation and architectural decisions.
+
+AI-generated suggestions were treated as assistance rather than automatically accepted solutions. The final implementation was reviewed and tested to ensure it met the project's requirements.
 
 **Important distinction:** Gemini is also an application dependency. Its runtime use for generating health-related responses is separate from the use of AI assistants during software development.
 
