@@ -1,0 +1,84 @@
+# HealthTrack AI 2.0 — Futuristic Medical Command Centre Theme
+# Single locked dark appearance matching the electric-teal / near-black palette.
+
+[theme]
+base = "dark"
+primaryColor       = "#00D6C5"              # Electric teal — buttons, links, active elements
+backgroundColor    = "#080B12"              # Near-black — main content background
+secondaryBackgroundColor = "#101722"        # Slightly lighter — widget / card backgrounds
+textColor          = "#E8EDF5"              # Soft white — body text
+linkColor          = "#36BFFF"             # Cyan — hyperlinks
+borderColor        = "#1E2D45"             # Muted navy — widget borders
+codeTextColor      = "#7EE8E0"             # Light teal — inline code
+codeBackgroundColor = "#0D1826"            # Very dark — code blocks
+
+showWidgetBorder   = true
+showSidebarBorder  = true
+baseRadius         = "8px"
+buttonRadius       = "8px"
+
+# Typography — Inter for body, JetBrains Mono for code
+font        = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+headingFont = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap"
+codeFont    = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+
+baseFontSize   = 14
+baseFontWeight = 400
+headingFontSizes  = ["32px", "24px", "20px", "16px", "14px", "12px"]
+headingFontWeights = [700, 700, 600, 600, 500, 500]
+linkUnderline = false
+
+# Semantic palette tuned for medical / alert contexts
+greenColor  = "#00D6C5"   # Teal for success (matches primary)
+blueColor   = "#36BFFF"   # Cyan for info
+redColor    = "#FF4B6E"   # Hot pink-red for critical alerts
+yellowColor = "#F5C842"   # Amber for warnings
+orangeColor = "#FF7E42"   # Orange for caution
+violetColor = "#8B6DFF"   # Purple accent
+grayColor   = "#6B8099"   # Cool grey for secondary text
+
+# Chart palettes — teal-first, matched to medical command-centre aesthetic
+chartCategoricalColors = [
+    "#00D6C5",
+    "#36BFFF",
+    "#8B6DFF",
+    "#FF4B6E",
+    "#F5C842",
+    "#FF7E42",
+    "#6B8099",
+]
+chartSequentialColors = [
+    "#020D1A",
+    "#04213B",
+    "#06355C",
+    "#084A7D",
+    "#0A5E9E",
+    "#0E82C8",
+    "#1DAEE0",
+    "#36BFFF",
+    "#7EE8E0",
+    "#B2FFF8",
+]
+
+# Dataframe chrome
+dataframeBorderColor          = "#1E2D45"
+dataframeHeaderBackgroundColor = "#101722"
+dataframeHeaderTextColor       = "#00D6C5"
+
+# Compact padding for a dense dashboard feel
+paddingTop    = "0.5rem"
+paddingBottom = "1rem"
+
+[theme.sidebar]
+backgroundColor          = "#060910"
+secondaryBackgroundColor = "#0D1420"
+textColor                = "#C8D8E8"
+borderColor              = "#1A2840"
+primaryColor             = "#00D6C5"
+linkColor                = "#36BFFF"
+codeBackgroundColor      = "#0D1826"
+codeTextColor            = "#7EE8E0"
+paddingTop               = "1rem"
+paddingBottom            = "1rem"
+[server]
+enableStaticServing = true

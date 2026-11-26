@@ -26,3 +26,6 @@ htmlcov/
 # IDE and OS
 .DS_Store
 .vscode/
+# Local AI coding assistant symlinks
+.agents/
+.claude/
