@@ -6,6 +6,7 @@ from backend.app import models  # noqa: F401
 from backend.app.database import Base, engine
 from backend.app.routers.ai import router as ai_router
 from backend.app.routers.analytics import router as analytics_router
+from backend.app.routers.mood_sleep import router as mood_sleep_router
 from backend.app.routers.rag import router as rag_router
 from backend.app.routers.symptoms import router as symptoms_router
 
@@ -20,6 +21,7 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="HealthTrack AI", version="0.1.0", lifespan=lifespan)
 app.include_router(symptoms_router)
 app.include_router(analytics_router)
+app.include_router(mood_sleep_router)
 app.include_router(ai_router)
 app.include_router(rag_router)
 
